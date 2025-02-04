@@ -42,6 +42,11 @@ client = openai.OpenAI(api_key=OPENAI_API_KEY)
 # Create uploads directory if it doesn't exist
 Path(app.config['UPLOAD_FOLDER']).mkdir(parents=True, exist_ok=True)
 
+# Helper functions
+def allowed_file(filename: str) -> bool:
+    """Check if the file extension is allowed."""
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
+
 # Rate limiting
 request_history: List[float] = []
 
@@ -64,9 +69,6 @@ def add_security_headers(response):
     response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
     response.headers['Content-Security-Policy'] = "default-src 'self'"
     return response
-
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def extract_chapters_epub(file_path: str) -> List[Dict[str, str]]:
     """Extract chapters from an EPUB file."""

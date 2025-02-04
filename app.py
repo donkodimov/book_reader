@@ -219,21 +219,61 @@ def create_app(testing=False):
         app.config['DEBUG'] = False
     return app
 
+def get_server_config() -> tuple[str, int, bool]:
+    """
+    Get server configuration from environment variables.
+    
+    Returns:
+        tuple: (host, port, debug_mode)
+        
+    Security Note:
+        - In development: Binds to localhost only
+        - In production: Binds to specified host or localhost by default
+        - Never runs in debug mode in production
+    """
+    # Get environment variables with secure defaults
+    env = os.getenv('FLASK_ENV', 'production')
+    port = int(os.getenv('PORT', '50869'))
+    
+    # In development, always bind to localhost
+    if env == 'development':
+        host = '127.0.0.1'
+        debug = True
+    else:
+        # In production, use specified host or localhost by default
+        host = os.getenv('HOST', '127.0.0.1')  # Default to localhost
+        debug = False  # Never debug in production
+        
+        # If binding to all interfaces is absolutely necessary,
+        # it must be explicitly enabled
+        if os.getenv('ALLOW_ALL_INTERFACES') == 'true':
+            logger.warning("Security Warning: Binding to all network interfaces!")
+            host = '0.0.0.0'  # nosec B104 # Explicitly enabled by configuration
+    
+    return host, port, debug
+
 if __name__ == '__main__':
     try:
         logger.info("Starting server...")
-        port = int(os.getenv('PORT', 50869))
-        debug = os.getenv('FLASK_ENV') == 'development'
         
-        # In production, debug should always be False
-        if not debug:
-            app.config['DEBUG'] = False
+        # Get secure server configuration
+        host, port, debug = get_server_config()
         
-        app.run(
-            host='127.0.0.1' if debug else '0.0.0.0',
-            port=port,
-            debug=debug
-        )
+        # Additional security checks
+        if debug:
+            if not host.startswith('127.0.0.1'):
+                raise ValueError("Debug mode can only be used with localhost")
+            logger.warning("Running in debug mode - NOT FOR PRODUCTION USE")
+        
+        # Configure app security
+        app.config['DEBUG'] = debug
+        app.config['TESTING'] = False
+        app.config['PROPAGATE_EXCEPTIONS'] = not debug
+        
+        # Start server with secure configuration
+        logger.info(f"Server starting on {host}:{port} (debug={debug})")
+        app.run(host=host, port=port, debug=debug)
+        
     except Exception as e:
         logger.error(f"Error starting server: {e}")
         raise

@@ -40,12 +40,48 @@ OPENAI_API_KEY=your_api_key_here
 
 ## Usage
 
-1. Start the server:
+### Development Mode
+
+1. Start the server in development mode:
 ```bash
-python app.py
+FLASK_ENV=development python app.py
 ```
 
 2. Open your browser and navigate to `http://localhost:50869`
+
+### Production Mode
+
+For production deployment, configure the following environment variables:
+
+```bash
+# Required
+OPENAI_API_KEY=your_api_key_here
+
+# Optional (with secure defaults)
+FLASK_ENV=production        # Default: production
+PORT=50869                 # Default: 50869
+HOST=127.0.0.1            # Default: 127.0.0.1
+ALLOW_ALL_INTERFACES=false # Default: false
+
+# Start the server
+python app.py
+```
+
+### Security Notes
+
+1. **Network Binding**:
+   - Development: Always binds to localhost (127.0.0.1)
+   - Production: Binds to localhost by default
+   - To bind to all interfaces (0.0.0.0), set `ALLOW_ALL_INTERFACES=true`
+
+2. **Debug Mode**:
+   - Automatically enabled in development
+   - Never enabled in production
+   - Only works with localhost binding
+
+3. **Rate Limiting**:
+   - 100 requests per hour by default
+   - Configurable through app configuration
 
 3. Upload an EPUB or PDF file using the upload button
 

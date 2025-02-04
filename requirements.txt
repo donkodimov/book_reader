@@ -1,5 +1,11 @@
 flask>=3.1.0
 ebooklib>=0.18
-PyPDF2>=3.0.1
+PyPDF2>=3.0.2  # Fixed CVE-2023-36464
 openai>=1.60.2
 python-dotenv>=1.0.1
+
+# Security-related packages
+Werkzeug>=3.0.1
+itsdangerous>=2.1.2
+cryptography>=41.0.0
+certifi>=2023.7.22

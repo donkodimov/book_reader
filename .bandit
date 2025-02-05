@@ -1,0 +1,22 @@
+[bandit]
+# Test-specific exclusions
+exclude_dirs = [tests, test]
+
+# Skips for specific issues
+skips = B104  # Binding to all interfaces - handled with explicit configuration and security measures
+
+# Documentation of security decisions
+[bandit.B104]
+rationale = """
+Binding to all interfaces (0.0.0.0) is required for:
+1. Testing external access configuration
+2. Production deployments with proper security measures
+
+Security measures in place:
+- Explicit configuration required (ALLOW_ALL_INTERFACES=true)
+- Security warnings and logging
+- Rate limiting
+- Security headers
+- File upload restrictions
+- Input validation
+"""

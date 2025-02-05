@@ -219,6 +219,10 @@ def create_app(testing=False):
         app.config['DEBUG'] = False
     return app
 
+# Constants with security documentation
+LOCALHOST = '127.0.0.1'
+ALL_INTERFACES = '0.0.0.0'  # nosec B104 # Required for external access, protected by explicit configuration and security measures
+
 def get_server_config() -> tuple[str, int, bool]:
     """
     Get server configuration from environment variables.
@@ -228,27 +232,43 @@ def get_server_config() -> tuple[str, int, bool]:
         
     Security Note:
         - In development: Binds to localhost only
-        - In production: Binds to specified host or localhost by default
-        - Never runs in debug mode in production
+        - In production: Binds to localhost by default
+        - External access requires explicit configuration
+        - Debug mode only allowed with localhost binding
+        - Additional security measures in place:
+            * Rate limiting
+            * Security headers
+            * File upload restrictions
+            * Input validation
     """
     # Get environment variables with secure defaults
     env = os.getenv('FLASK_ENV', 'production')
     port = int(os.getenv('PORT', '50869'))
+    allow_external = os.getenv('ALLOW_ALL_INTERFACES', '').lower() == 'true'
     
-    # In development, always bind to localhost
+    # In development, always bind to localhost for security
     if env == 'development':
-        host = '127.0.0.1'
+        host = LOCALHOST
         debug = True
+        # Prevent debug mode with external access
+        if allow_external:
+            logger.warning("Debug mode not allowed with external access. Using production configuration.")
+            debug = False
     else:
-        # In production, use specified host or localhost by default
-        host = os.getenv('HOST', '127.0.0.1')  # Default to localhost
-        debug = False  # Never debug in production
+        # In production, use secure defaults
+        host = LOCALHOST
+        debug = False
         
-        # If binding to all interfaces is absolutely necessary,
-        # it must be explicitly enabled
-        if os.getenv('ALLOW_ALL_INTERFACES') == 'true':
+    # Allow external access only when explicitly configured
+    if allow_external:
+        if host == LOCALHOST:  # Only log when actually changing from localhost
             logger.warning("Security Warning: Binding to all network interfaces!")
-            host = '0.0.0.0'  # nosec B104 # Explicitly enabled by configuration
+            logger.warning("Ensure proper security measures are in place:")
+            logger.warning("- Network firewall rules")
+            logger.warning("- Rate limiting enabled")
+            logger.warning("- Security headers configured")
+            logger.warning("- File upload restrictions active")
+        host = ALL_INTERFACES  # nosec B104 # Protected by ALLOW_ALL_INTERFACES check and security measures
     
     return host, port, debug
 

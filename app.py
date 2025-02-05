@@ -24,7 +24,7 @@ load_dotenv()
 # Validate required environment variables
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 if not OPENAI_API_KEY:
-    logger.error("OPENAI_API_KEY environment variable is not set")
+    logger.warning("OPENAI_API_KEY environment variable is not set")
     raise ValueError("OPENAI_API_KEY environment variable is required")
 
 # Initialize Flask app with security headers
@@ -90,12 +90,12 @@ def extract_chapters_epub(file_path: str) -> List[Dict[str, str]]:
                         'content': content
                     })
                 except UnicodeDecodeError as e:
-                    logger.error(f"Error decoding chapter content: {e}")
+                    logger.warning(f"Error decoding chapter content: {e}")
                     continue
         
         return chapters
     except Exception as e:
-        logger.error(f"Error processing EPUB file: {e}")
+        logger.warning(f"Error processing EPUB file: {e}")
         raise ValueError("Failed to process EPUB file")
 
 def extract_chapters_pdf(file_path: str) -> List[Dict[str, str]]:
@@ -113,12 +113,12 @@ def extract_chapters_pdf(file_path: str) -> List[Dict[str, str]]:
                         'content': content
                     })
             except Exception as e:
-                logger.error(f"Error extracting text from page {i + 1}: {e}")
+                logger.warning(f"Error extracting text from page {i + 1}: {e}")
                 continue
         
         return chapters
     except Exception as e:
-        logger.error(f"Error processing PDF file: {e}")
+        logger.warning(f"Error processing PDF file: {e}")
         raise ValueError("Failed to process PDF file")
 
 def get_chapter_summary(content: str) -> str:
@@ -140,7 +140,7 @@ def get_chapter_summary(content: str) -> str:
         )
         return response.choices[0].message.content
     except Exception as e:
-        logger.error(f"Error generating summary: {e}")
+        logger.warning(f"Error generating summary: {e}")
         raise ValueError("Failed to generate summary")
 
 @app.route('/')
@@ -188,7 +188,7 @@ def upload_file():
         except ValueError as e:
             return jsonify({'error': str(e)}), 400
         except Exception as e:
-            logger.error(f"Error processing file: {e}")
+            logger.warning(f"Error processing file: {e}")
             return jsonify({'error': 'Internal server error'}), 500
         finally:
             # Ensure file is cleaned up even if processing fails
@@ -196,7 +196,7 @@ def upload_file():
                 os.remove(filepath)
                 
     except Exception as e:
-        logger.error(f"Error handling file upload: {e}")
+        logger.warning(f"Error handling file upload: {e}")
         return jsonify({'error': 'Failed to process upload'}), 500
 
 @app.route('/summarize', methods=['POST'])
@@ -214,7 +214,7 @@ def summarize():
     except ValueError as e:
         return jsonify({'error': str(e)}), 400
     except Exception as e:
-        logger.error(f"Error generating summary: {e}")
+        logger.warning(f"Error generating summary: {e}")
         return jsonify({'error': 'Internal server error'}), 500
 
 def create_app(testing=False):
@@ -300,5 +300,5 @@ if __name__ == '__main__':
         app.run(host=host, port=port, debug=debug)
         
     except Exception as e:
-        logger.error(f"Error starting server: {e}")
+        logger.warning(f"Error starting server: {e}")
         raise

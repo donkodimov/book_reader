@@ -7,7 +7,7 @@ from werkzeug.utils import secure_filename
 from werkzeug.middleware.proxy_fix import ProxyFix
 import ebooklib
 from ebooklib import epub
-from PyPDF2 import PdfReader
+from pypdf import PdfReader
 import openai
 from dotenv import load_dotenv
 from functools import wraps

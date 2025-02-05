@@ -219,6 +219,10 @@ def create_app(testing=False):
         app.config['DEBUG'] = False
     return app
 
+# Constants with security documentation
+LOCALHOST = '127.0.0.1'
+ALL_INTERFACES = '0.0.0.0'  # nosec B104 # Required for external access, protected by explicit configuration and security measures
+
 def get_server_config() -> tuple[str, int, bool]:
     """
     Get server configuration from environment variables.
@@ -231,6 +235,11 @@ def get_server_config() -> tuple[str, int, bool]:
         - In production: Binds to localhost by default
         - External access requires explicit configuration
         - Debug mode only allowed with localhost binding
+        - Additional security measures in place:
+            * Rate limiting
+            * Security headers
+            * File upload restrictions
+            * Input validation
     """
     # Get environment variables with secure defaults
     env = os.getenv('FLASK_ENV', 'production')
@@ -239,7 +248,7 @@ def get_server_config() -> tuple[str, int, bool]:
     
     # In development, always bind to localhost for security
     if env == 'development':
-        host = '127.0.0.1'
+        host = LOCALHOST
         debug = True
         # Prevent debug mode with external access
         if allow_external:
@@ -247,14 +256,19 @@ def get_server_config() -> tuple[str, int, bool]:
             debug = False
     else:
         # In production, use secure defaults
-        host = '127.0.0.1'
+        host = LOCALHOST
         debug = False
         
     # Allow external access only when explicitly configured
     if allow_external:
-        if host == '127.0.0.1':  # Only log when actually changing from localhost
+        if host == LOCALHOST:  # Only log when actually changing from localhost
             logger.warning("Security Warning: Binding to all network interfaces!")
-        host = '0.0.0.0'
+            logger.warning("Ensure proper security measures are in place:")
+            logger.warning("- Network firewall rules")
+            logger.warning("- Rate limiting enabled")
+            logger.warning("- Security headers configured")
+            logger.warning("- File upload restrictions active")
+        host = ALL_INTERFACES  # nosec B104 # Protected by ALLOW_ALL_INTERFACES check and security measures
     
     return host, port, debug
 

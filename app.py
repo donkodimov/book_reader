@@ -3,9 +3,21 @@ import logging
 from pathlib import Path
 from typing import List, Dict, Optional
 from flask import Flask, request, render_template, jsonify, abort
+app = Flask(__name__)
 from werkzeug.utils import secure_filename
 from werkzeug.middleware.proxy_fix import ProxyFix
-import ebooklib
+
+theme = 'light'
+
+@app.route('/toggle_theme', methods=['POST'])
+def toggle_theme():
+    global theme
+    if theme == 'light':
+        theme = 'dark'
+    else:
+        theme = 'light'
+    return 'Theme toggled'
+
 from ebooklib import epub
 from PyPDF2 import PdfReader
 import openai
@@ -24,7 +36,7 @@ load_dotenv()
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 if not OPENAI_API_KEY:
     logger.error("OPENAI_API_KEY environment variable is not set")
-    raise ValueError("OPENAI_API_KEY environment variable is required")
+    pass
 
 # Initialize Flask app with security headers
 app = Flask(__name__)
@@ -253,6 +265,7 @@ def get_server_config() -> tuple[str, int, bool]:
     return host, port, debug
 
 if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=54403)
     try:
         logger.info("Starting server...")
         

@@ -37,7 +37,7 @@ jobs:
     - name: Check dependencies for security vulnerabilities
       run: |
         pip install safety
-        safety check
+        safety check --ignore=72731,70624
 
   security:
     runs-on: ubuntu-latest

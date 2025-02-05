@@ -221,6 +221,10 @@
                 <p>Upload an EPUB or PDF file to start reading.</p>
             </div>
             <div id="loading" class="loading">Loading...</div>
+            <div class="pagination-buttons" style="text-align: center; margin-top: 10px;">
+                <button onclick="previousChapter()">Previous Page</button>
+                <button onclick="nextChapter()">Next Page</button>
+            </div>
         </div>
         <div class="resizer" id="resizer2"></div>
         <div class="summary">
@@ -438,6 +442,18 @@
             } finally {
                 summaryButton.disabled = false;
                 summaryLoading.style.display = 'none';
+            }
+        }
+
+        function nextChapter() {
+            if (currentChapters.length > 0 && currentChapterIndex < currentChapters.length - 1) {
+                displayChapter(currentChapterIndex + 1);
+            }
+        }
+
+        function previousChapter() {
+            if (currentChapters.length > 0 && currentChapterIndex > 0) {
+                displayChapter(currentChapterIndex - 1);
             }
         }
     </script>

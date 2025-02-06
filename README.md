@@ -108,3 +108,47 @@ python app.py
 ## License
 
 MIT License
+
+# Versioning Strategy
+
+Our application follows **Semantic Versioning (SemVer)**, which uses the format:
+
+MAJOR.MINOR.PATCH
+
+- **MAJOR:** Incremented for incompatible API changes.
+- **MINOR:** Incremented for backward-compatible feature additions.
+- **PATCH:** Incremented for backward-compatible bug fixes.
+
+## Release Automation
+
+We leverage [semantic-release](https://semantic-release.gitbook.io/semantic-release/) to automatically manage version bumps, generate release notes, and create Git tags based on commit messages that follow the [Conventional Commits](https://www.conventionalcommits.org/) specification. Here's how the process works:
+
+1. **Commit Messages:**  
+   Use clear commit messages such as:
+   - `feat: add new functionality` (for new features)
+   - `fix: resolve bug in processing` (for bug fixes)
+   
+   These help determine whether a MAJOR, MINOR, or PATCH version bump is needed.
+
+2. **GitHub Actions Workflow:**  
+   The `.github/workflows/release.yml` workflow is triggered when changes are pushed to the `main` branch. It runs semantic-release to:
+   - Analyze commit messages.
+   - Automatically bump the version.
+   - Generate release notes and update the CHANGELOG.
+   - Create a new Git tag (e.g., `v1.2.3`).
+
+3. **Docker Publish:**  
+   Our `docker-publish` GitHub Action is set to run on pushes for tags matching `v*.*.*`. When a new tag is created by semantic-release, the Docker image is built and published with a tag that matches the newly released version.
+   
+## Workflow Overview
+
+- **Development:**  
+  Developers work on feature branches, following the Conventional Commits style.
+- **Merge:**  
+  Once changes are merged into `main`, the release workflow triggers.
+- **Release:**  
+  semantic-release calculates the next version number, updates the changelog, and tags the release.
+- **Deployment:**  
+  Docker images are automatically built and pushed with the version tag (and optionally as `latest`).
+
+This approach ensures that each release is clearly versioned and that our Docker images are properly tagged for easy identification and rollback if needed.

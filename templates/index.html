@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap">    
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -29,7 +28,7 @@
         body {
             margin: 0;
             padding: 0;
-            font-family: 'Roboto', sans-serif;
+            font-family: Arial, sans-serif;
             background-color: var(--bg-primary);
             color: var(--text-primary);
             transition: background-color 0.3s, color 0.3s;
@@ -417,42 +416,37 @@
         }
 
         async function generateSummary() {
-    if (currentChapterIndex === -1) {
-        alert('Please select a chapter first');
-        return;
-    }
+            if (currentChapterIndex === -1) {
+                alert('Please select a chapter first');
+                return;
+            }
 
-    const chapter = currentChapters[currentChapterIndex];
-    const summaryButton = document.getElementById('generate-summary');
-    const summaryLoading = document.getElementById('summary-loading');
-    
-    // Disable button and show loading
-    summaryButton.disabled = true;
-    summaryLoading.style.display = 'block';
-    document.getElementById('summary-content').textContent = '';
+            const chapter = currentChapters[currentChapterIndex];
+            const summaryButton = document.getElementById('generate-summary');
+            const summaryLoading = document.getElementById('summary-loading');
+            
+            // Disable button and show loading
+            summaryButton.disabled = true;
+            summaryLoading.style.display = 'block';
+            document.getElementById('summary-content').textContent = '';
 
-    try {
-        const response = await fetch('/summarize', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ content: chapter.content })
-        });
-        const data = await response.json();
-        if (data.error) {
-            // If there's an error message in the response, display it.
-            document.getElementById('summary-content').textContent = data.error;
-        } else {
-            document.getElementById('summary-content').textContent = data.summary;
+            try {
+                const response = await fetch('/summarize', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ content: chapter.content })
+                });
+                const data = await response.json();
+                document.getElementById('summary-content').textContent = data.summary;
+            } catch (error) {
+                document.getElementById('summary-content').textContent = 'Error generating summary: ' + error.message;
+            } finally {
+                summaryButton.disabled = false;
+                summaryLoading.style.display = 'none';
+            }
         }
-    } catch (error) {
-        document.getElementById('summary-content').textContent = 'Error generating summary: ' + error.message;
-    } finally {
-        summaryButton.disabled = false;
-        summaryLoading.style.display = 'none';
-    }
-}
 
         function nextChapter() {
             if (currentChapters.length > 0 && currentChapterIndex < currentChapters.length - 1) {

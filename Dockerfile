@@ -22,6 +22,7 @@ ENV FLASK_APP=app.py
 ENV FLASK_ENV=production
 ENV HOST=0.0.0.0
 ENV PORT=50869
+ENV ALLOW_ALL_INTERFACES=true
 
 # Expose the port the app runs on
 EXPOSE 50869

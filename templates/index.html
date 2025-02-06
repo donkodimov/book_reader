@@ -256,11 +256,14 @@
 
         // Initialize theme from localStorage
         document.addEventListener('DOMContentLoaded', () => {
-            const savedTheme = localStorage.getItem('theme');
-            if (savedTheme) {
-                isDarkTheme = savedTheme === 'dark';
-                document.body.setAttribute('data-theme', savedTheme);
-            }
+            // If there is no saved theme, default to dark
+            let savedTheme = localStorage.getItem('theme') || 'dark';
+            // Save the default to localStorage if not present
+            localStorage.setItem('theme', savedTheme);
+
+            // Update the global flag and body attribute
+            isDarkTheme = savedTheme === 'dark';
+            document.body.setAttribute('data-theme', savedTheme);
         });
 
         // Resizable panels

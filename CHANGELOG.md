@@ -1,3 +1,10 @@
+# [0.3.0](https://github.com/donkodimov/book_reader/compare/v0.2.1...v0.3.0) (2025-02-06)
+
+
+### Features
+
+* Enhance error handling and typography in book reader app ([b6d31d5](https://github.com/donkodimov/book_reader/commit/b6d31d5ab66b3da966f38a0afb8666ef990dedda))
+
 ## [0.2.1](https://github.com/donkodimov/book_reader/compare/v0.2.0...v0.2.1) (2025-02-06)
 
 

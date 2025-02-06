@@ -34,7 +34,7 @@ app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
 # Security configurations
 app.config['UPLOAD_FOLDER'] = os.path.abspath(os.path.join(os.path.dirname(__file__), 'uploads'))
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
+app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50MB max file size
 app.config['ALLOWED_EXTENSIONS'] = {'epub', 'pdf'}
 app.config['RATE_LIMIT'] = {'requests': 100, 'window': 3600}  # 100 requests per hour
 

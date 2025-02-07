@@ -13,6 +13,7 @@ import openai
 from dotenv import load_dotenv
 from functools import wraps
 import time
+from bs4 import BeautifulSoup
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -76,23 +77,80 @@ def add_security_headers(response):
     return response
 
 def extract_chapters_epub(file_path: str) -> List[Dict[str, str]]:
-    """Extract chapters from an EPUB file."""
+    """Extract chapters from an EPUB file using the TOC when available."""
     try:
         book = epub.read_epub(file_path)
         chapters = []
-        
-        for item in book.get_items():
-            if item.get_type() == ebooklib.ITEM_DOCUMENT:
+
+        # Build a mapping from document href (filename) to the item
+        doc_items = {
+            item.get_name(): item
+            for item in book.get_items()
+            if item.get_type() == ebooklib.ITEM_DOCUMENT
+        }
+
+        def get_chapter_title(content: bytes, default: str) -> str:
+            """Try to extract a chapter title from HTML using BeautifulSoup."""
+            try:
+                soup = BeautifulSoup(content, 'html.parser')
+                # Look for an <h1> first, then fallback to <title>
+                header = soup.find('h1') or soup.find('title')
+                if header and header.string:
+                    return header.string.strip()
+            except Exception as e:
+                logger.warning(f"Error parsing HTML for chapter title: {e}")
+            return default
+
+        def process_toc(toc_entries):
+            # Process each toc entry (which could be a Link or a tuple for nested chapters)
+            for entry in toc_entries:
+                if isinstance(entry, tuple) and len(entry) == 2:
+                    link, sub_entries = entry
+                else:
+                    link, sub_entries = entry, None
+
+                chapter_title = link.title  # The title from TOC should be preferred
+                href = link.href  # This is the reference for the chapter
+
+                # Look up the document item that matches the href
+                doc_item = doc_items.get(href)
+                content = b""
+                if doc_item:
+                    try:
+                        content = doc_item.get_content()
+                    except UnicodeDecodeError as e:
+                        logger.warning(f"Error decoding chapter content: {e}")
+
+                # If no title present in the TOC (or if it seems to be a file name), try to extract from content
+                if not chapter_title or chapter_title.lower().endswith(('.xhtml', '.html', '.htm')):
+                    chapter_title = get_chapter_title(content, default=href)
+
+                chapters.append({
+                    'title': chapter_title,
+                    'content': content.decode('utf-8', errors='ignore')
+                })
+
+                # If there are sub-chapters, process them recursively
+                if sub_entries:
+                    process_toc(sub_entries)
+
+        # Process the TOC if it exists.
+        if book.toc:
+            process_toc(book.toc)
+        else:
+            # Fallback: if no TOC available, use all document items
+            for name, item in doc_items.items():
                 try:
-                    content = item.get_content().decode('utf-8')
+                    content = item.get_content()
+                    chapter_title = get_chapter_title(content, default=name)
                     chapters.append({
-                        'title': item.get_name(),
-                        'content': content
+                        'title': chapter_title,
+                        'content': content.decode('utf-8', errors='ignore')
                     })
-                except UnicodeDecodeError as e:
-                    logger.warning(f"Error decoding chapter content: {e}")
+                except Exception as e:
+                    logger.warning(f"Error processing document item {name}: {e}")
                     continue
-        
+
         return chapters
     except Exception as e:
         logger.warning(f"Error processing EPUB file: {e}")
@@ -165,6 +223,10 @@ def upload_file():
     
     try:
         filename = secure_filename(file.filename)
+        name_without_ext, _ = os.path.splitext(filename)
+        # Replace underscores with spaces.
+        clean_book_name = name_without_ext.replace("_", " ")
+        print(f"name_without_ext: {name_without_ext}")
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         
         # Save file securely
@@ -172,7 +234,7 @@ def upload_file():
         
         try:
             # Process file based on type
-            if filename.endswith('.epub'):
+            if filename.lower().endswith('.epub'):
                 chapters = extract_chapters_epub(filepath)
             else:
                 chapters = extract_chapters_pdf(filepath)
@@ -182,8 +244,9 @@ def upload_file():
             
             if not chapters:
                 return jsonify({'error': 'No content found in file'}), 400
-            
-            return jsonify({'chapters': chapters})
+
+            # Return the chapters along with the book name (without extension)
+            return jsonify({'chapters': chapters, 'book_name': clean_book_name})
             
         except ValueError as e:
             return jsonify({'error': str(e)}), 400

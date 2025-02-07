@@ -1,0 +1,288 @@
+/* Updated Light Theme Color Variables */
+:root {
+    /* Light Theme Variables */
+    --bg-primary: #ffffff;         /* Main content background: white */
+    --bg-secondary: #f5f6f7;         /* Sidebar & summary background: very light gray */
+    --text-primary: #0a0a23;         /* Primary text: dark blue/gray */
+    --text-secondary: #1b1b32;       /* Secondary text */
+    --border-color: #d0d0d5;         /* Light gray border */
+    --hover-color: #dfdfe2;          /* Hover states */
+    --accent-color: #4d3800;         /* Dark yellow accent */
+
+    /* New variables for header and resizer in the light theme */
+    --header-bg: #f5f6f7;            /* Light header background */
+    --footer-bg: #f5f6f7;            /* Light footer background */
+    --resizer-bg: #d0d0d5;           /* Light resizer background */
+    --resizer-after-bg: #bdbdbd;     /* New color for resizer::after in light theme */
+}
+
+[data-theme="dark"] {
+    /* Dark Theme based on freeCodeCamp's layout colors */
+    --bg-primary: #0a0a23;          /* Gray 90 */
+    --bg-secondary: #1b1b32;        /* Gray 85 */
+    --text-primary: #f5f6f7;        /* Gray 05 */
+    --text-secondary: #dfdfe2;      /* Gray 10 */
+    --border-color: #3b3b4f;        /* Gray 75 */
+    --hover-color: #2a2a40;         /* Gray 80 */
+    --accent-color: #f1be32;        /* Yellow Accent */
+
+    /* Dark theme header and resizer */
+    --header-bg: #0a0a23;
+    --footer-bg: #0a0a23;
+    --resizer-bg: #3b3b4f;
+    --resizer-after-bg: #3b3b4f; /* Suitable dark value for resizer pseudo-element */
+}
+
+/* Updated Header Styling with Separation */
+header {
+    background-color: var(--header-bg);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    text-align: center;
+    border-bottom: 2px solid var(--border-color);
+}
+
+header h1 {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 2rem;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Roboto', sans-serif;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.container {
+    display: flex;
+    height: calc(100vh - 80px - 60px); /* subtract header and footer heights */
+}
+
+.sidebar {
+    min-width: 200px;
+    width: 250px;
+    background-color: var(--bg-secondary);
+    padding: 20px;
+    overflow-y: auto;
+    position: relative;
+}
+
+.content {
+    flex-grow: 1;
+    padding: 20px;
+    overflow-y: auto;
+    background-color: var(--bg-secondary);
+}
+
+.summary {
+    min-width: 250px;
+    width: 300px;
+    background-color: var(--bg-secondary);
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.resizer {
+    width: 8px;
+    cursor: col-resize;
+    background-color: var(--resizer-bg);
+    transition: background-color 0.3s;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+.resizer:hover, .resizer.resizing {
+    background-color: var(--accent-color);
+}
+
+.resizer::after {
+    content: "";
+    display: block;
+    width: 2px;
+    height: 100%;
+    background-color: var(--resizer-after-bg);
+    margin: 0 auto;
+    opacity: 0.5;
+}
+
+.chapter-link {
+    cursor: pointer;
+    padding: 12px;
+    margin: 8px 0;
+    background-color: var(--bg-primary);
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    transition: all 0.2s;
+    word-wrap: break-word;
+}
+
+.chapter-link:hover {
+    background-color: var(--hover-color);
+    transform: translateX(5px);
+}
+
+.chapter-link.active {
+    border-left: 4px solid var(--accent-color);
+    background-color: var(--hover-color);
+}
+
+.upload-section {
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: var(--bg-primary);
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+}
+
+#content {
+    line-height: 1.8;
+    padding: 20px;
+    background-color: var(--bg-primary);
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+}
+
+.loading {
+    display: none;
+    text-align: center;
+    padding: 20px;
+    color: var(--text-secondary);
+}
+
+button {
+    padding: 8px 15px;
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+button:hover {
+    opacity: 0.9;
+}
+
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.theme-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    padding: 10px;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    background-color: var(--accent-color);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+input[type="file"] {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    margin: 10px 0;
+    padding: 8px;
+    background-color: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    color: var(--text-primary);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--border-color);
+}
+
+#summary-content {
+    margin-top: 15px;
+    padding: 15px;
+    background-color: var(--bg-primary);
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+}
+
+#summary-loading {
+    margin-top: 10px;
+    color: var(--text-secondary);
+}
+
+/* Sidebar toggle button for mobile */
+.sidebar-toggle {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1100;
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    padding: 10px;
+    font-size: 20px;
+    border-radius: 4px;
+    display: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+        height: calc(100vh - 80px);
+    }
+    
+    .resizer {
+        display: none;
+    }
+    
+    .sidebar {
+        position: fixed;
+        left: -250px;
+        top: 0;
+        height: 100vh;
+        width: 250px;
+        overflow-y: auto;
+        z-index: 1000;
+        transition: left 0.3s ease;
+        background-color: var(--bg-secondary);
+        padding: 20px;
+    }
+    
+    .sidebar.active {
+        left: 0;
+    }
+    
+    .content, .summary {
+        width: 100%;
+    }
+    
+    .sidebar-toggle {
+        display: block;
+    }
+}
+
+/* Footer Styling */
+footer {
+    background-color: var(--footer-bg);
+    padding: 15px;
+    text-align: center;
+    border-top: 2px solid var(--border-color);
+    font-size: 0.9rem;
+    color: var(--text-primary);
+} 

@@ -129,6 +129,7 @@ async function uploadBook() {
             body: formData
         });
         const data = await response.json();
+        console.log(data);
         if (data.error) {
             alert(data.error);
             return;
@@ -137,7 +138,7 @@ async function uploadBook() {
         displayChapters(data.chapters);
         
         // Update the uploaded book's name (display only the file name)
-        document.getElementById('book-name').textContent = file.name;
+        document.getElementById('book-name').textContent = data.book_name;
     } catch (error) {
         alert('Error uploading file: ' + error);
     }

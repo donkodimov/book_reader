@@ -4,6 +4,7 @@ flask-cors==5.0.0
 pypdf==5.2.0
 openai>=1.60.2
 python-dotenv>=1.0.1
+beautifulsoup4==4.12.2
 
 # Security-related packages
 Werkzeug>=3.0.1

@@ -1,3 +1,10 @@
+# [0.4.0](https://github.com/donkodimov/book_reader/compare/v0.3.0...v0.4.0) (2025-02-07)
+
+
+### Features
+
+* Restore error handling and typography improvements ([a2b45d9](https://github.com/donkodimov/book_reader/commit/a2b45d97ee4dfe9666d7e72465a9b27de01bbce8))
+
 # [0.3.0](https://github.com/donkodimov/book_reader/compare/v0.2.1...v0.3.0) (2025-02-06)
 
 
